@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'ClienteController@index');
+
+Route::resource('/cliente','ClienteController');
