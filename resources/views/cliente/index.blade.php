@@ -13,7 +13,7 @@
     
     <div class="row">
         <div class="col-md-2 col-xs-2 col-sm-2">
-            <button type="button" class="btn btn-primary btn-sm btn-block"><span class="fa fa-plus"></span> Novo</button>
+            <button type="button" id="novo-cliente" class="btn btn-primary btn-sm btn-block"><span class="fa fa-plus"></span> Novo</button>
         </div>
     </div>
     
@@ -26,7 +26,7 @@
                         <tr>
                             <th class="text-center" width="5">#</th>
                             <th>Razão Social</th>
-                            <th class="text-center" width="30">Status</th>
+                            <th class="text-center" width="40">STATUS</th>
                             <th class="text-center">Data de Criação</th>
                             <th class="text-center">Data de Edição</th>
                             <th class="text-center">Edição</th>
@@ -60,15 +60,121 @@
                     </tbody>
                 </table>
             </div>
-            
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="novo-cliente-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cliente-modal">Nova mensagem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>  
+            <div class="modal-body">
+                <form action="" method="POST">
+                    {!! csrf_field() !!}
+                    <div class="form-group">
+                        <label>Razão Social</label>
+                        <input type="text" name="razaoSocial" id="razaoSocial" class="form-control">
+                    </div>
+                    <div class="form-group">
+                            <label>STATUS</label>
+                        </div>
+                        <div>
+                            <label class="switch">
+                                <input checked name="ativo" id="ativo" type="checkbox" value="1">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="salvar-cliente">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @stop
 
 @section('js')
 <script>
     $(function(){
+        
+        $('#novo-cliente').on('click',function(e){
+            e.preventDefault();
+            $('#cliente-modal').text("Novo Cliente");
+            $('#novo-cliente-modal').modal('show');
+        });
+
+        $("input[name=ativo]").change(function () {
+            if (document.getElementById("ativo").checked == true){
+                $('#ativo').val('1');
+            } else{
+                $('#ativo').val('0');
+            }
+        });
+
+        $('#salvar-cliente').on('click',function(e){
+            e.preventDefault();
+            console.log($("#razaoSocial").val());
+            console.log($("#ativo").val());
+
+            $.ajax({
+                type: 'POST',
+                url: '/cliente',
+                data: {
+                    '_token': $('input[name=_token]').val(),
+                    'razaoSocial': $("#razaoSocial").val(),
+                    'ativo': $("#ativo").val(),
+                },
+                beforeSend: function() {
+                    $('#carregamento-title').text("Processando...");
+                    $('#carregamento').modal('show');
+                    
+                },
+                success: function(data) {
+                    $('#carregamento').modal('hide');
+                    swal({
+                        title: "Sucesso",
+                        text: "",
+                        icon: "success",
+                    })
+                    .then((value) => {
+                        location.reload();
+                    });
+
+                },
+                error: function(data) {
+                    $('#carregamento').modal('hide');
+                    var dados = $.parseJSON(data.responseText);
+                    var erro = "";
+                    if(data.status == 422){
+                        if(dados.errors.razaoSocial){
+                            var linha_nova = dados.errors.razaoSocial.toString();
+                            var linha = linha_nova.replace("razaoSocial", "Razão Social");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                        if(dados.errors.ativo){
+                            var linha_nova = dados.errors.ativo.toString();
+                            var linha = linha_nova.replace("ativo", "Ativo");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                    }else{
+                        erro = "Erro Desconhecido!";
+                    }
+                     swal("Error", erro , "error");
+                    
+                },
+            });
+        });
+        
+        
         $('#dataTable').DataTable({
             "language": {
                 "sEmptyTable": "Nenhum registro encontrado",
@@ -92,17 +198,7 @@
                     "sSortAscending": ": Ordenar colunas de forma ascendente",
                     "sSortDescending": ": Ordenar colunas de forma descendente"
                 }
-            },
-            dom: 'Bfrtip',
-            buttons: [
-                {
-                    text: "<i class='fa fa-plus'></i>  NOVO",
-                    action: function () {
-                        window.location.replace("#");
-                    }
-                }
-            ]
-
+            }
         });
     });
 </script>

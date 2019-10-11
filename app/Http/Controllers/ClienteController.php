@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Cliente;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request;s
 use Illuminate\Support\Facades\Validator;
 
 class ClienteController extends Controller
 {
+
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'razaoSocial' => 'required',
+            'ativo' => 'required',            
+        ]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -26,7 +34,7 @@ class ClienteController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -37,7 +45,13 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validator($request->all())->validate();   
+        $cliente = new Cliente();
+        $cliente->razaoSocial = $request->razaoSocial;
+        $cliente->bolAtivo = $request->ativo;
+        $cliente->save();
+
+        return response()->json();
     }
 
     /**

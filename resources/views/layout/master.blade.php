@@ -4,8 +4,10 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <meta name="_token" content="{{ csrf_token() }}">
+        
         <title>Recrutamento Mindtec</title>
+
+        <meta name="_token" content="{{ csrf_token() }}">
         
         <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
         
@@ -22,6 +24,7 @@
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
         
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     
         @yield('css')
     </head>
@@ -37,9 +40,10 @@
         <script src="//cdn.datatables.net/v/bs/dt-1.10.18/datatables.min.js"></script>
         <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
         <script src="//cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+        <script src="//unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         
         @yield('body')
-        
+        @include('layout.carregamento')
         @yield('js')
     </body>
 </html>

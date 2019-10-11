@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Guilherme/Documents/Programas/sistema/routes/web.php</file>
+            <file>file:/C:/Users/Guilherme/Documents/Programas/sistema/app/Http/Controllers/ClienteController.php</file>
+            <file>file:/C:/Users/Guilherme/Documents/Programas/sistema/resources/views/cliente/index.blade.php</file>
+            <file>file:/C:/Users/Guilherme/Documents/Programas/sistema/.env</file>
+            <file>file:/C:/Users/Guilherme/Documents/Programas/sistema/database/migrations/2019_10_10_023325_create_clientes_table.php</file>
+        </group>
+    </open-files>
+</project-private>
