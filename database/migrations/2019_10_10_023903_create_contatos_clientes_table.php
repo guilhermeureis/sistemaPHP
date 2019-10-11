@@ -15,10 +15,10 @@ class CreateContatosClientesTable extends Migration
     {
         Schema::create('contatosClientes', function (Blueprint $table) {
             
-            $table->bigIncrements('idContato');
+            $table->bigIncrements('id');
             
             $table->unsignedBigInteger('idCliente');
-            $table->foreign('idCliente')->references('idCliente')->on('clientes');
+            $table->foreign('idCliente')->references('id')->on('clientes');
             $table->string('tipoContato');
             $table->string('descContato');
             $table->integer('ativo');

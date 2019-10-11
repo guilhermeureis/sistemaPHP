@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Cliente;
-use Illuminate\Http\Request;s
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ClienteController extends Controller
 {
@@ -71,9 +72,11 @@ class ClienteController extends Controller
      * @param  \App\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function edit(Cliente $cliente)
+    public function edit($id)
     {
-        //
+        $cliente = Cliente::findOrFail($id);
+        $contatos = $cliente->contatos();
+        return view('cliente.edit',compact('cliente','contatos'));
     }
 
     /**
@@ -83,9 +86,15 @@ class ClienteController extends Controller
      * @param  \App\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Cliente $cliente)
+    public function update(Request $request, $id)
     {
-        //
+        $this->validator($request->all())->validate();   
+        $cliente = Cliente::findOrFail($id);
+        $cliente->razaoSocial = $request->razaoSocial;
+        $cliente->bolAtivo = $request->ativo;
+        $cliente->save();
+
+        return response()->json();
     }
 
     /**
@@ -94,8 +103,12 @@ class ClienteController extends Controller
      * @param  \App\Cliente  $cliente
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Cliente $cliente)
+    public function destroy($id)
     {
-        //
+
+        $cliente = Cliente::findOrFail($id);
+        $cliente->delete();
+
+        return response()->json();    
     }
 }

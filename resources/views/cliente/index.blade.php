@@ -46,12 +46,12 @@
                             <td class="text-center">{{$cliente->created_at->format('H:i:s - d/m/Y')}}</td> 
                             <td class="text-center">{{$cliente->updated_at->format('H:i:s - d/m/Y')}}</td>
                             <td class="text-center">
-                                <button class="edit">
+                                <button class="edit-cliente" data-id="{{$cliente->id}}">
                                     <span class="fa fa-edit"></span>
                                 </button>
                             </td>
                             <td class="text-center">
-                                <button class="remove">
+                                <button class="remove-cliente" data-id="{{$cliente->id}}">
                                     <span class="fa fa-trash"></span>
                                 </button>
                             </td>
@@ -82,13 +82,13 @@
                     </div>
                     <div class="form-group">
                             <label>STATUS</label>
-                        </div>
-                        <div>
-                            <label class="switch">
-                                <input checked name="ativo" id="ativo" type="checkbox" value="1">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
+                    </div>
+                    <div>
+                        <label class="switch">
+                            <input checked name="ativo" id="ativo" type="checkbox" value="1">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -172,6 +172,66 @@
                     
                 },
             });
+        });
+
+        $(".edit-cliente").on('click',function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            location.replace("cliente/"+id+"/edit");
+
+        });
+
+
+        $(".remove-cliente").on('click', function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            swal({
+                title: "Deseja continuar?",
+                text: "Deseja realmente remover o cliente?",
+                icon: "warning",
+                buttons: ["Cancelar","Confirmar"],
+                dangerMode: true,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                                        
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "/cliente/" + id,
+                        data: {
+                            '_token': $('input[name=_token]').val(),
+                            'id' : id,
+                        },
+                        beforeSend: function() {
+                            $('#carregamento-title').text("Processando...");
+                            $('#carregamento').modal('show');
+                        },
+                        success: function() {
+                            $('#carregamento').modal('hide');
+                            $('.modal-title').text("");
+                            swal({
+                                title: "Removido",
+                                text: "O cliente foi removido com sucesso!",
+                                icon: "success",
+                            })
+                                .then((value) => {
+                                    location.reload();
+                                });
+                        },
+                        error: function(data) {
+                            $('#carregamento').modal('hide');
+                            $('.modal-title').text("");
+                            var erro = "";
+                            
+                            swal("Erro",erro, "error");
+                        },
+                    })
+                  
+                } else {
+                  swal("Cancelado","A remoção foi cancelada!","info");
+                }
+            });
+
         });
         
         
