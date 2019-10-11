@@ -14,3 +14,4 @@
 Route::get('/', 'ClienteController@index');
 
 Route::resource('/cliente','ClienteController');
+Route::resource('/contato','ContatoClienteController');

@@ -122,8 +122,6 @@
 
         $('#salvar-cliente').on('click',function(e){
             e.preventDefault();
-            console.log($("#razaoSocial").val());
-            console.log($("#ativo").val());
 
             $.ajax({
                 type: 'POST',

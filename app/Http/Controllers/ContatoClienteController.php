@@ -4,9 +4,18 @@ namespace App\Http\Controllers;
 
 use App\ContatoCliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ContatoClienteController extends Controller
 {
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'tipoContato' => 'required',
+            'contato' => 'required',
+            'ativo' => 'required',            
+        ]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -35,7 +44,15 @@ class ContatoClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validator($request->all())->validate();   
+        $contato = new ContatoCliente();
+        $contato->idCliente = $request->id;
+        $contato->ativo = $request->ativo;
+        $contato->tipoContato = $request->tipoContato;
+        $contato->descContato = $request->contato;
+        $contato->save();
+
+        return response()->json();    
     }
 
     /**

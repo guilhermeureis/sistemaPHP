@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ContatoCliente extends Model
 {
 	use SoftDeletes;
+
+	protected $table = 'contatosClientes';
 	
     public function cliente()
     {

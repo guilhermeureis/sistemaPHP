@@ -37,6 +37,11 @@
         <hr>
 
         <h2>Contatos do Cliente</h2>
+        <div class="row">
+            <div class="col-md-2 col-xs-2 col-sm-2">
+                <button type="button" id="novo-contato" class="btn btn-primary btn-sm btn-block"><span class="fa fa-plus"></span> Novo</button>
+            </div>
+        </div>
         <br>
         <div class="row">
             <div class="col-md-12 col-xs-12 col-sm-12">
@@ -88,7 +93,44 @@
     </form>
 </div>
 
-
+<div class="modal fade" id="novo-contato-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contato-modal">Nova mensagem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>  
+            <div class="modal-body">
+                <form action="" method="POST">
+                    {!! csrf_field() !!}
+                    <div class="form-group">
+                        <label>Tipo de Contato</label>
+                        <input type="text" name="tipoContato" id="tipoContato" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Contato</label>
+                        <input type="text" name="descContato" id="descContato" class="form-control">
+                    </div>
+                    <div class="form-group">
+                            <label>STATUS</label>
+                    </div>
+                    <div>
+                        <label class="switch">
+                            <input checked name="ativoContato" id="ativoContato" type="checkbox" value="1">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="salvar-contato">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @stop
 
@@ -121,7 +163,7 @@
                 data: {
                     '_token': $('input[name=_token]').val(),
                     'razaoSocial': $("#razaoSocial").val(),
-                    'ativo': $("#ativo").val(),
+                    'ativo': $("#ativo").val()
                 },
                 beforeSend: function() {
                     $('#carregamento-title').text("Processando...");
@@ -192,6 +234,77 @@
                     "sSortDescending": ": Ordenar colunas de forma descendente"
                 }
             }
+        });
+
+        $('#novo-contato').on('click',function(e){
+            e.preventDefault();
+            $('#contato-modal').text("Novo Contato");
+            $('#novo-contato-modal').modal('show');
+        });
+
+        $("input[name=ativoContato]").change(function () {
+            if (document.getElementById("ativo").checked == true){
+                $('#ativo').val('1');
+            } else{
+                $('#ativo').val('0');
+            }
+        });
+        $('#salvar-contato').on('click',function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/contato',
+                data: {
+                    '_token': $('input[name=_token]').val(),
+                    'tipoContato': $("#tipoContato").val(),
+                    'contato': $("#descContato").val(),
+                    'ativo': $("#ativoContato").val(),
+                    'id': "{{$cliente->id}}"
+                },
+                beforeSend: function() {
+                    $('#carregamento-title').text("Processando...");
+                    $('#carregamento').modal('show');
+                    
+                },
+                success: function(data) {
+                    $('#carregamento').modal('hide');
+                    swal({
+                        title: "Sucesso",
+                        text: "",
+                        icon: "success",
+                    })
+                    .then((value) => {
+                        location.reload();
+                    });
+
+                },
+                error: function(data) {
+                    $('#carregamento').modal('hide');
+                    var dados = $.parseJSON(data.responseText);
+                    var erro = "";
+                    if(data.status == 422){
+                        if(dados.errors.tipoContato){
+                            var linha_nova = dados.errors.tipoContato.toString();
+                            var linha = linha_nova.replace("tipoContato", "Tipo de Contato");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                        if(dados.errors.contato){
+                            var linha_nova = dados.errors.contato.toString();
+                            var linha = linha_nova.replace("contato", "Contato");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                        if(dados.errors.ativo){
+                            var linha_nova = dados.errors.ativo.toString();
+                            var linha = linha_nova.replace("ativoContato", "STATUS");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                    }else{
+                        erro = "Erro Desconhecido!";
+                    }
+                     swal("Error", erro , "error");
+                    
+                },
+            });
         });
     });
 </script>
