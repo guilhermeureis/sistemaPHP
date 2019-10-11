@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Cliente;
+use App\ContatoCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -75,7 +76,9 @@ class ClienteController extends Controller
     public function edit($id)
     {
         $cliente = Cliente::findOrFail($id);
-        $contatos = $cliente->contatos();
+        $id_cliente = $cliente->id;
+        $contatos = ContatoCliente::where('idCliente',$id_cliente)->get();
+        // dd($contatos);
         return view('cliente.edit',compact('cliente','contatos'));
     }
 

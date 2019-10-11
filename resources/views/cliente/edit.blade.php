@@ -50,11 +50,11 @@
                         <thead>
                             <tr>
                                 <th class="text-center" width="5">#</th>
-                                <th>Tipo do Contato</th>
+                                <th class="text-center">Tipo do Contato</th>
                                 <th class="text-center">Contato</th>
                                 <th class="text-center" width="40">STATUS</th>
-                                <th class="text-center">Edição</th>
-                                <th class="text-center">Remoção</th>
+                                <th class="text-center" width="40">Edição</th>
+                                <th class="text-center" width="40">Remoção</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,7 +62,7 @@
                             <tr>
                                 <td class="text-center">{{++$index}}</td>
                                 <td class="text-center">{{$contato->tipoContato}}</td>
-                                 <td>{{$contato->tipoContato}}</td>
+                                <td>{{$contato->tipoContato}}</td>
                                 @if($contato->ativo == 1)
                                     <td class="text-center"><small class="badge badge-pill badge-success">ATIVO</small></td>
                                 @else
@@ -119,6 +119,45 @@
                     <div>
                         <label class="switch">
                             <input checked name="ativoContato" id="ativoContato" type="checkbox" value="1">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="salvar-contato">Enviar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="edit-contato-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contato-edit-modal">Nova mensagem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>  
+            <div class="modal-body">
+                <form action="" method="POST">
+                    {!! csrf_field() !!}
+                    <div class="form-group">
+                        <label>Tipo de Contato</label>
+                        <input type="text" name="tipoContato_edit" id="tipoContato_edit" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Contato</label>
+                        <input type="text" name="descContato_edit" id="descContato_edit" class="form-control">
+                    </div>
+                    <div class="form-group">
+                            <label>STATUS</label>
+                    </div>
+                    <div>
+                        <label class="switch">
+                            <input checked name="ativoContato_edit" id="ativoContato_edit" type="checkbox" value="1">
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -243,10 +282,10 @@
         });
 
         $("input[name=ativoContato]").change(function () {
-            if (document.getElementById("ativo").checked == true){
-                $('#ativo').val('1');
+            if (document.getElementById("ativoContato").checked == true){
+                $('#ativoContato').val('1');
             } else{
-                $('#ativo').val('0');
+                $('#ativoContato').val('0');
             }
         });
         $('#salvar-contato').on('click',function(e){
@@ -306,6 +345,7 @@
                 },
             });
         });
+
     });
 </script>
 @stop
