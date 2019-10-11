@@ -62,7 +62,7 @@
                             <tr>
                                 <td class="text-center">{{++$index}}</td>
                                 <td class="text-center">{{$contato->tipoContato}}</td>
-                                <td>{{$contato->tipoContato}}</td>
+                                <td>{{$contato->descContato}}</td>
                                 @if($contato->ativo == 1)
                                     <td class="text-center"><small class="badge badge-pill badge-success">ATIVO</small></td>
                                 @else
@@ -70,7 +70,9 @@
                                 @endif
                                
                                 <td class="text-center">
-                                    <button class="edit-contato" data-id="{{$contato->id}}">
+                                    <button class="modal-edit-contato" data-id="{{$contato->id}}"
+                                                                data-tipo="{{$contato->tipoContato}}"data-contato="{{$contato->descContato}}"
+                                                                data-ativo="{{$contato->ativo}}">
                                         <span class="fa fa-edit"></span>
                                     </button>
                                 </td>
@@ -142,7 +144,7 @@
                 </button>
             </div>  
             <div class="modal-body">
-                <form action="" method="POST">
+                <form action="" method="PUT">
                     {!! csrf_field() !!}
                     <div class="form-group">
                         <label>Tipo de Contato</label>
@@ -165,7 +167,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary" id="salvar-contato">Enviar</button>
+                <button type="button" class="btn btn-primary" id="editar-contato">Enviar</button>
             </div>
         </div>
     </div>
@@ -288,6 +290,7 @@
                 $('#ativoContato').val('0');
             }
         });
+
         $('#salvar-contato').on('click',function(e){
             e.preventDefault();
             $.ajax({
@@ -344,6 +347,143 @@
                     
                 },
             });
+        });
+
+        
+        var id;
+        $(".modal-edit-contato").on('click',function(e){
+            e.preventDefault();
+            id = $(this).data('id')
+            $('#contato-edit-modal').text("Editar Contato");
+            $('#tipoContato_edit').val($(this).data('tipo'));
+            $('#descContato_edit').val($(this).data('contato'));
+            $('#ativoContato_edit').val($(this).data('ativo'));
+            var ativo = $(this).data('ativo')
+            if(ativo == 1){
+                document.getElementById("ativoContato_edit").checked = true;
+            }else{
+                document.getElementById("ativoContato_edit").checked = false;
+            }
+            $('#edit-contato-modal').modal('show');
+        });
+
+        $("input[name=ativoContato_edit]").change(function () {
+            if (document.getElementById("ativoContato_edit").checked == true){
+                $('#ativoContato_edit').val('1');
+            } else{
+                $('#ativoContato_edit').val('0');
+            }
+        });
+
+        $('#editar-contato').on('click',function(e){
+            e.preventDefault();
+            
+            $.ajax({
+                type: 'PUT',
+                url: '/contato/'+id,
+                data: {
+                   '_token': $('input[name=_token]').val(),
+                    'tipoContato': $("#tipoContato_edit").val(),
+                    'contato': $("#descContato_edit").val(),
+                    'ativo': $("#ativoContato_edit").val(),
+                    'idCliente': "{{$cliente->id}}"
+                },
+                beforeSend: function() {
+                    $('#carregamento-title').text("Processando...");
+                    $('#carregamento').modal('show');
+                    
+                },
+                success: function(data) {
+                    $('#carregamento').modal('hide');
+                    swal({
+                        title: "Sucesso",
+                        text: "",
+                        icon: "success",
+                    })
+                    .then((value) => {
+                        location.reload();
+                    });
+
+                },
+                error: function(data) {
+                    $('#carregamento').modal('hide');
+                    var dados = $.parseJSON(data.responseText);
+                    var erro = "";
+                    if(data.status == 422){
+                        if(dados.errors.tipoContato){
+                            var linha_nova = dados.errors.tipoContato.toString();
+                            var linha = linha_nova.replace("tipoContato", "Tipo de Contato");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                        if(dados.errors.contato){
+                            var linha_nova = dados.errors.contato.toString();
+                            var linha = linha_nova.replace("contato", "Contato");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                        if(dados.errors.ativo){
+                            var linha_nova = dados.errors.ativo.toString();
+                            var linha = linha_nova.replace("ativoContato", "STATUS");
+                            erro = erro + "-> " + linha + "\n" ;
+                        }
+                    }else{
+                        erro = "Erro Desconhecido!";
+                    }
+                     swal("Error", erro , "error");
+                    
+                },
+            });
+        });
+
+        $(".remove-contato").on('click', function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            swal({
+                title: "Deseja continuar?",
+                text: "Deseja realmente remover o contato?",
+                icon: "warning",
+                buttons: ["Cancelar","Confirmar"],
+                dangerMode: true,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                                        
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "/contato/" + id,
+                        data: {
+                            '_token': $('input[name=_token]').val(),
+                            'id' : id,
+                        },
+                        beforeSend: function() {
+                            $('#carregamento-title').text("Processando...");
+                            $('#carregamento').modal('show');
+                        },
+                        success: function() {
+                            $('#carregamento').modal('hide');
+                            $('.modal-title').text("");
+                            swal({
+                                title: "Removido",
+                                text: "O contato foi removido com sucesso!",
+                                icon: "success",
+                            })
+                                .then((value) => {
+                                    location.reload();
+                                });
+                        },
+                        error: function(data) {
+                            $('#carregamento').modal('hide');
+                            $('.modal-title').text("");
+                            var erro = "";
+                            
+                            swal("Erro",erro, "error");
+                        },
+                    })
+                  
+                } else {
+                  swal("Cancelado","A remoção foi cancelada!","info");
+                }
+            });
+
         });
 
     });

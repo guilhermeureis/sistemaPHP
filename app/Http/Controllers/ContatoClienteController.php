@@ -84,10 +84,17 @@ class ContatoClienteController extends Controller
      * @param  \App\ContatoCliente  $contatoCliente
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ContatoCliente $contatoCliente)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $this->validator($request->all())->validate();   
+        $contato = ContatoCliente::findOrFail($id);
+        $contato->idCliente = $request->idCliente;
+        $contato->ativo = $request->ativo;
+        $contato->tipoContato = $request->tipoContato;
+        $contato->descContato = $request->contato;
+        $contato->save();
+
+        return response()->json();      }
 
     /**
      * Remove the specified resource from storage.
@@ -95,8 +102,10 @@ class ContatoClienteController extends Controller
      * @param  \App\ContatoCliente  $contatoCliente
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ContatoCliente $contatoCliente)
+    public function destroy($id)
     {
-        //
-    }
+        $contato = ContatoCliente::findOrFail($id);
+        $contato->delete();
+
+        return response()->json();     }
 }
